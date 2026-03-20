@@ -63,6 +63,10 @@ class QuizDetailSerializer(QuizListSerializer):
         # Only return questions if the quiz is fully ready
         if obj.status == Quiz.Status.READY:
             questions = obj.get_questions_with_choices()
+            # Admins see correct answers and explanations
+            request = self.context.get('request')
+            if request and hasattr(request, 'user') and request.user.role == 'admin':
+                return QuestionWithAnswerSerializer(questions, many=True).data
             return QuestionSerializer(questions, many=True).data
         return []
 

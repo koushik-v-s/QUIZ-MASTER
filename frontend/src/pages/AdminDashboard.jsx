@@ -5,9 +5,10 @@ import { Link } from 'react-router-dom';
 import { 
   Users, Database, Activity, TrendingUp, PlusCircle, 
   BrainCircuit, AlertTriangle, CheckCircle2, Loader2, 
-  BarChart3, Sparkles, RefreshCw, Eye
+  BarChart3, Sparkles, RefreshCw, Eye, Trash2
 } from 'lucide-react';
 import ElectricBorder from '../components/ElectricBorder';
+import toast from 'react-hot-toast';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -26,6 +27,17 @@ export default function AdminDashboard() {
       console.error('Admin dashboard load failed', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteQuiz = async (quizId, quizTitle) => {
+    if (!window.confirm(`Are you sure you want to delete "${quizTitle}"? This cannot be undone.`)) return;
+    try {
+      await api.delete(`/quizzes/${quizId}/`);
+      toast.success('Quiz deleted successfully');
+      fetchData();
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Failed to delete quiz');
     }
   };
 
@@ -163,6 +175,13 @@ export default function AdminDashboard() {
                         View
                       </Link>
                     )}
+                    <button
+                      onClick={() => handleDeleteQuiz(quiz.id, quiz.title)}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg text-xs font-medium transition-all"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Remove
+                    </button>
                   </div>
                 </div>
               ))}

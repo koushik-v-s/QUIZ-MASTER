@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../lib/axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BrainCircuit, Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import { BrainCircuit, Loader2, Sparkles, AlertCircle, CheckCircle2, PlusCircle, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ElectricBorder from '../components/ElectricBorder';
 
 export default function CreateQuiz() {
   const navigate = useNavigate();
-  const [step, setStep] = useState('form'); // 'form' | 'generating' | 'error'
+  const [step, setStep] = useState('form'); // 'form' | 'generating' | 'done' | 'error'
   const [errorMsg, setErrorMsg] = useState('');
   const [createdQuizId, setCreatedQuizId] = useState(null);
 
@@ -49,7 +49,7 @@ export default function CreateQuiz() {
           if (status === 'ready') {
             clearInterval(interval);
             toast.success('Quiz generated successfully!');
-            navigate(`/quiz/${createdQuizId}/take`);
+            setStep('done');
           } else if (status === 'failed') {
             clearInterval(interval);
             setErrorMsg(data.data.error_message || 'AI Generation failed.');
@@ -196,6 +196,51 @@ export default function CreateQuiz() {
             <p className="text-gray-400 max-w-sm">
               Grok is researching your topic, writing challenging questions, and generating detailed explanations. This might take 10-30 seconds.
             </p>
+          </motion.div>
+        )}
+
+        {step === 'done' && (
+          <motion.div
+            key="done"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center p-16 text-center bg-[#111] rounded-2xl border border-emerald-500/30 shadow-[0_0_40px_rgba(16,185,129,0.15)]"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full blur-xl bg-emerald-500/20" />
+              <CheckCircle2 className="w-20 h-20 text-emerald-400 relative z-10" />
+            </div>
+            <h3 className="text-2xl font-bold mt-8 mb-2 text-emerald-300">Quiz Generated Successfully!</h3>
+            <p className="text-gray-400 max-w-sm mb-8">
+              Your AI-powered quiz has been created and is ready for users to attempt.
+            </p>
+            <div className="flex items-center gap-4">
+              <Link
+                to={`/quiz/${createdQuizId}/preview`}
+                className="flex items-center gap-2 px-6 py-3 bg-[#222] hover:bg-[#333] rounded-xl text-white font-medium transition-colors border border-[#444]"
+              >
+                <Eye className="w-5 h-5" />
+                View Quiz
+              </Link>
+              <button
+                onClick={() => {
+                  setStep('form');
+                  setCreatedQuizId(null);
+                  setFormData({
+                    title: '',
+                    topic: '',
+                    difficulty: 'medium',
+                    question_count: 5,
+                    time_limit_minutes: 10,
+                    is_public: true
+                  });
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+              >
+                <PlusCircle className="w-5 h-5" />
+                Generate Another Quiz
+              </button>
+            </div>
           </motion.div>
         )}
 
