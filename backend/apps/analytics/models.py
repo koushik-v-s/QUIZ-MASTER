@@ -71,8 +71,20 @@ class UserStat(models.Model):
             # Determine strongest/weakest topics
             topics = TopicPerformance.objects.filter(user=user, attempts_count__gt=0).order_by('-average_score')
             if topics.exists():
-                stat.strongest_topic = topics.first().topic
-                stat.weakest_topic = topics.last().topic
+                strongest = topics.first()
+                if strongest.average_score > 50:
+                    stat.strongest_topic = strongest.topic
+                else:
+                    stat.strongest_topic = "Keep discovering your strengths!"
+                
+                weakest = topics.last()
+                if weakest.average_score <= 50:
+                    stat.weakest_topic = weakest.topic
+                else:
+                    stat.weakest_topic = "Great work! No weak topics found."
+            else:
+                stat.strongest_topic = "Take quizzes to find your strengths!"
+                stat.weakest_topic = "Take quizzes to find your weaknesses!"
 
             # Update streak
             if completed_attempts.exists():
