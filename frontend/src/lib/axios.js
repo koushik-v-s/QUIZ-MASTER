@@ -7,21 +7,13 @@ const api = axios.create({
   },
 });
 
-// Request Interceptor: Attach access token and prevent IE/browser caching
+// Request Interceptor: Attach access token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
-    // Disable browser caching for GET requests to fix stale dashboard bug
-    if (config.method?.toLowerCase() === 'get') {
-      config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
-      config.headers['Pragma'] = 'no-cache';
-      config.headers['Expires'] = '0';
-    }
-    
     return config;
   },
   (error) => Promise.reject(error)
