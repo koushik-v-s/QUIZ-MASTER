@@ -17,9 +17,10 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
+      const timestamp = Date.now();
       const [statsRes, quizzesRes] = await Promise.all([
-        api.get('/admin/stats/'),
-        api.get('/quizzes/my/')
+        api.get(`/admin/stats/?t=${timestamp}`),
+        api.get(`/quizzes/my/?t=${timestamp}`)
       ]);
       setStats(statsRes.data.data);
       setMyQuizzes(quizzesRes.data.data?.results || quizzesRes.data.data || []);

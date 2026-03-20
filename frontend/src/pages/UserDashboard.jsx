@@ -16,10 +16,11 @@ export default function UserDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
+        const timestamp = Date.now();
         const [statsRes, attemptsRes, quizzesRes] = await Promise.all([
-          api.get('/analytics/me/'),
-          api.get('/attempts/'),
-          api.get('/quizzes/')
+          api.get(`/analytics/me/?t=${timestamp}`),
+          api.get(`/attempts/?t=${timestamp}`),
+          api.get(`/quizzes/?t=${timestamp}`)
         ]);
         setStats(statsRes.data.data);
         
