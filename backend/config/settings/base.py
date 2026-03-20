@@ -112,6 +112,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/minute',
+        'user': '60/minute',
+    },
     'DEFAULT_PAGINATION_CLASS': 'core.pagination.StandardPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_FILTER_BACKENDS': (
@@ -211,7 +219,7 @@ else:
 # ─── drf-spectacular (OpenAPI / Swagger) ──────────────────────────────
 SPECTACULAR_SETTINGS = {
     'TITLE': 'AI-Powered Quiz API',
-    'DESCRIPTION': 'A production-grade AI-powered quiz application API with Gemini integration.',
+    'DESCRIPTION': 'A production-grade AI-powered quiz application API with Grok AI integration.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SCHEMA_PATH_PREFIX': '/api/v1/',
