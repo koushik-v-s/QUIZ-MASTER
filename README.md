@@ -1,10 +1,10 @@
 # Teach Edison: AI-Powered Quiz Platform
 
-A production-grade, full-stack application that leverages Google's Gemini AI to dynamically generate complex multiple-choice quizzes, evaluate performance, and track analytics over time.
+A production-grade, full-stack application that leverages Grok AI (via Groq) to dynamically generate complex multiple-choice quizzes, evaluate performance, and track analytics over time.
 
 ## 🚀 Key Features
 
-*   **Intelligent Quiz Generation:** Input a topic and difficulty, and Gemini AI generates 5-20 specific, high-quality questions with incorrect distractors and detailed explanations.
+*   **Intelligent Quiz Generation:** Input a topic and difficulty, and Grok AI generates 5-20 specific, high-quality questions with incorrect distractors and detailed explanations.
 *   **Asynchronous Processing:** Long-running AI generation is handled safely via Celery and Redis to prevent timeouts and ensure reliability.
 *   **Real-time Polling:** The React frontend polls the backend for quiz generation status, transitioning smoothly using Framer Motion animations.
 *   **Advanced Analytics:** Tracks total quizzes, average score, daily streaks, global leaderboards, and topic-specific mastery over time.
@@ -16,7 +16,7 @@ A production-grade, full-stack application that leverages Google's Gemini AI to 
 **Backend:**
 *   **Framework:** Django 4.2.9, Django REST Framework
 *   **Database:** PostgreSQL (via `psycopg2-binary`)
-*   **AI Integration:** Google Gemini API (`google-generativeai`)
+*   **AI Integration:** Grok AI (`groq` SDK)
 *   **Task Queue & Caching:** Celery, Redis
 *   **Authentication:** JWT (SimpleJWT)
 
@@ -34,7 +34,7 @@ A production-grade, full-stack application that leverages Google's Gemini AI to 
 2.  Create a virtual environment: `python -m venv venv`
 3.  Activate it: `venv\Scripts\activate.bat` (Windows) or `source venv/bin/activate` (Mac/Linux).
 4.  Install dependencies: `pip install -r requirements.txt`
-5.  Create a `.env` file in `backend/` using the format in `.env.example`. Make sure to add your `GEMINI_API_KEY`.
+5.  Create a `.env` file in `backend/` using the format in `.env.example`. Make sure to add your `GROQ_API_KEY`.
 6.  Run migrations: `python manage.py migrate`
 7.  Seed database: `python manage.py seed_data`
 8.  Start Django: `python manage.py runserver`
@@ -93,7 +93,7 @@ The REST API is organized logically around core resources. All endpoints (except
 ## 🧠 Design Decisions & Trade-offs
 
 *   **Asynchronous AI Generation:** 
-    *   *Decision:* Instead of blocking the HTTP request while Gemini generates questions (which can easily timeout after 30+ seconds), I utilized Celery + Redis to queue the task and immediate return a `status: 'generating'` response. The frontend polls a lightweight `/status/` endpoint.
+    *   *Decision:* Instead of blocking the HTTP request while Grok generates questions (which can easily timeout after 30+ seconds), I utilized Celery + Redis to queue the task and immediate return a `status: 'generating'` response. The frontend polls a lightweight `/status/` endpoint.
     *   *Trade-off:* Introduces slightly higher infrastructure complexity (needs Redis and Celery worker), but drastically improves UX.
 *   **Analytics Denormalization:**
     *   *Decision:* Calculating overall average scores, streaks, and topic mastered on-the-fly via `GROUP BY` aggregations across the entire Attempts table during a Dashboard load would lead to N+1 querying and massive slowdowns at scale. Instead, I introduced a denormalized `UserStat` model that updates synchronously at the end of every attempt via Django Signals/Method calls.
@@ -104,7 +104,7 @@ The REST API is organized logically around core resources. All endpoints (except
 ## 🚧 Challenges Faced and Solutions
 
 *   **Handling Unpredictable AI Outputs:**
-    *   *Challenge:* The Gemini API would sometimes return malformed JSON, markdown-wrapped JSON, or miss required fields (like explanations or the exact correct answer text).
+    *   *Challenge:* The Grok API would sometimes return malformed JSON, markdown-wrapped JSON, or miss required fields (like explanations or the exact correct answer text).
     *   *Solution:* Implemented robust Pydantic-like structural validation in the Celery task. If validation fails, the generator auto-retries the API call (up to 3 times) with an explicit prompt correction appended.
 *   **React State Desync During Quiz:**
     *   *Challenge:* Managing the timer, selected answers, and submission states simultaneously led to edge-case bugs (e.g. submitting twice if the timer hits 0 while the user clicks "Next").
@@ -112,9 +112,9 @@ The REST API is organized logically around core resources. All endpoints (except
 
 ## 🤖 How AI Integration was Handled
 
-1.  **Prompt Engineering:** I crafted a strict, rigid system prompt forcing the `gemini-1.5-flash` model to output a continuous, standard string of JSON without backticks or meta-narrative.
-2.  **Service Layer:** Created a dedicated `GeminiService` class within the backend to abstract all AI initialization, token handling, and network calls via the `google-generativeai` SDK.
-3.  **Task Offloading:** The `create_quiz` API view simply saves a Quiz record with `status='generating'` and passes the ID to a Celery delayed task. The task invokes `GeminiService`, parses the JSON, atomically saves Questions and Choices into Postgres, and flips `status='ready'`.
+1.  **Prompt Engineering:** I crafted a strict, rigid system prompt forcing the `llama-3.3-70b-versatile` model to output a continuous, standard string of JSON without backticks or meta-narrative.
+2.  **Service Layer:** Created a dedicated `GroqQuizGenerator` class within the backend to abstract all AI initialization, token handling, and network calls via the `groq` SDK.
+3.  **Task Offloading:** The `create_quiz` API view simply saves a Quiz record with `status='generating'` and passes the ID to a Celery delayed task. The task invokes `GroqQuizGenerator`, parses the JSON, atomically saves Questions and Choices into Postgres, and flips `status='ready'`.
 
 ## 🧪 Testing Approach
 
@@ -123,7 +123,7 @@ I adopted a Postman-style API testing methodology throughout development because
 1.  **Endpoint Verification (Postman/ThunderClient):** 
     *   Used standard collections to hit Auth, Quizzes, Attempts, and Analytics endpoints individually. Validated payload constraints (e.g. attempting to submit an answer after an Attempt was marked "Completed" returns a `400 Bad Request`).
 2.  **Celery/Queue Local Testing:** 
-    *   Verified the async task by monitoring the Celery worker logs. Simulated Gemini failures (e.g., using a bad API key or forcing invalid JSON mocking) to ensure the Model's status correctly set to `failed` and updated the frontend.
+    *   Verified the async task by monitoring the Celery worker logs. Simulated Grok failures (e.g., using a bad API key or forcing invalid JSON mocking) to ensure the Model's status correctly set to `failed` and updated the frontend.
 3.  **Manual E2E Flow:**
     *   Full path traces: User Registration -> Token fetch -> Admin generating Quiz -> Frontend Polling -> User answers Questions -> User Views Analytics -> Validate Topic Strength calculations.
 
