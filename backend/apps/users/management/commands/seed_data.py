@@ -16,9 +16,9 @@ class Command(BaseCommand):
             admin_user = User.objects.create_superuser(
                 email=admin_email,
                 username='admin',
-                password='Admin@123'
+                password='admin123'
             )
-            self.stdout.write(self.style.SUCCESS(f'Created admin user: {admin_email} / Admin@123'))
+            self.stdout.write(self.style.SUCCESS(f'Created admin user: {admin_email} / admin123'))
         else:
             admin_user = User.objects.get(email=admin_email)
             self.stdout.write(f'Admin user {admin_email} already exists.')
