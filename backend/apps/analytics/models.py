@@ -6,6 +6,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.db.models import Avg, Max, Min, Sum, Count
+from django.core.cache import cache
 
 
 class UserStat(models.Model):
@@ -108,6 +109,11 @@ class UserStat(models.Model):
             stat.weakest_topic = None
 
         stat.save()
+        
+        # Invalidate API cache
+        cache.delete(f"user_stats_{user.id}")
+        cache.delete("global_leaderboard")
+
         return stat
 
 
@@ -222,4 +228,8 @@ class QuizStat(models.Model):
             stat.completion_rate = 0.0
 
         stat.save()
+        
+        # Invalidate API cache
+        cache.delete(f"quiz_stats_{quiz.id}")
+
         return stat
