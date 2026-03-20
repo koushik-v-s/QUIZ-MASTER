@@ -46,6 +46,17 @@
   </tr>
 </table>
 
+## 🌟 Bonus Features Implemented
+
+This project goes above and beyond a basic prototype by implementing several production-ready bonus requirements:
+
+*   👮 **Admin Interface:** Full quiz, user, and analytics management available via Django's built-in, highly-customizable Admin Panel.
+*   🚦 **API Rate Limiting:** Built-in DRF throttling protects the endpoints (10 requests/min for anonymous users, 60 requests/min for authenticated users).
+*   🧪 **Comprehensive Testing:** 30+ structured test cases covering all 4 Django apps (Users, Quizzes, Attempts, Analytics) to ensure API stability.
+*   ⚡ **Caching Strategies:** Redis caching is implemented for heavy analytics queries with a graceful fallback to local-memory caching if Redis drops.
+*   🛤️ **Background Processing:** Celery handles the 30-40 second AI generation times seamlessly in the background without blocking HTTP requests.
+*   🏷️ **API Versioning:** All endpoints are strictly grouped under the `/api/v1/` prefix for future scalability.
+
 ## 🛠 Tech Stack
 
 | Domain | Technologies |
