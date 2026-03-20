@@ -136,5 +136,5 @@ The database is built on PostgreSQL and structured logically for analytics:
     Managing the timer, selected answers, and submission states simultaneously led to edge-case bugs. Transitioning to Zustand with explicit action locks guarantees single-submissions during quiz-taking.
 
 <div align="center">
-  <p>Crafted with ❤️ by the Teach Edison Team.</p>
+  <p>Crafted with ❤️ by KOUSHIK V S.</p>
 </div>
