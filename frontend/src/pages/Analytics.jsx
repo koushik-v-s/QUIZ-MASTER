@@ -23,13 +23,7 @@ export default function Analytics() {
           api.get('/analytics/leaderboard/')
         ]);
         
-        // Format dates for the chart
-        const formattedHistory = historyRes.data.data.map(item => ({
-          ...item,
-          displayDate: new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-        }));
-        
-        setHistory(formattedHistory);
+        setHistory(historyRes.data.data);
         setTopics(topicsRes.data.data);
         setLeaderboard(leaderboardRes.data.data);
       } catch (err) {
@@ -47,7 +41,9 @@ export default function Analytics() {
     if (active && payload && payload.length) {
       return (
         <div className="bg-[#111] border border-[#333] p-4 rounded-xl shadow-xl">
-          <p className="text-gray-400 mb-1">{label}</p>
+          <p className="text-gray-400 mb-1">
+            {new Date(label).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          </p>
           <p className="text-white font-bold text-lg">{payload[0].value}%</p>
           {payload[0].payload.quiz_title && (
             <p className="text-brand-accent text-sm mt-1">{payload[0].payload.quiz_title}</p>
@@ -104,7 +100,15 @@ export default function Analytics() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
-                    <XAxis dataKey="displayDate" stroke="#666" tick={{ fill: '#666' }} axisLine={false} tickLine={false} />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#666" 
+                      tick={{ fill: '#666' }} 
+                      axisLine={false} 
+                      tickLine={false}
+                      tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      minTickGap={20}
+                    />
                     <YAxis stroke="#666" tick={{ fill: '#666' }} axisLine={false} tickLine={false} domain={[0, 100]} />
                     <RechartsTooltip content={<CustomTooltip />} />
                     <Area type="monotone" dataKey="score" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
