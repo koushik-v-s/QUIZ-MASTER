@@ -14,6 +14,7 @@ QUIZ_GENERATION_PROMPT = """
 You are a quiz generation expert. Generate exactly {question_count} multiple choice questions about "{topic}" at {difficulty} difficulty level.
 
 Rules:
+- You MUST generate EXACTLY {question_count} questions. Do not generate only 1 question.
 - Each question must have exactly 4 choices
 - Exactly 1 choice must be correct
 - Include a brief explanation for the correct answer
@@ -33,7 +34,8 @@ Respond ONLY with valid JSON in this exact format, with no markdown codeblocks, 
         {{"choice_text": "...", "is_correct": false}},
         {{"choice_text": "...", "is_correct": false}}
       ]
-    }}
+    }},
+    "... repeat exactly {question_count} times ..."
   ]
 }}
 """

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import api from '../lib/axios';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Users, Database, Activity, TrendingUp, PlusCircle, 
   BrainCircuit, AlertTriangle, CheckCircle2, Loader2, 
@@ -14,6 +14,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [myQuizzes, setMyQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   const fetchData = async () => {
     try {
@@ -42,7 +43,7 @@ export default function AdminDashboard() {
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [location.key]);
 
   if (loading) return (
     <div className="flex items-center justify-center h-[60vh]">

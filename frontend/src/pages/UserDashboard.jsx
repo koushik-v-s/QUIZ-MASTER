@@ -3,7 +3,7 @@ import { useAuthStore } from '../store/auth';
 import { motion } from 'framer-motion';
 import api from '../lib/axios';
 import { Brain, Target, Trophy, Clock, PlayCircle, Loader2, Flame, TrendingUp, CheckCircle2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import ElectricBorder from '../components/ElectricBorder';
 
 export default function UserDashboard() {
@@ -12,6 +12,7 @@ export default function UserDashboard() {
   const [attempts, setAttempts] = useState([]);
   const [availableQuizzes, setAvailableQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -43,7 +44,7 @@ export default function UserDashboard() {
       }
     };
     fetchDashboardData();
-  }, []);
+  }, [location.key]);
 
   if (loading) return (
     <div className="flex h-[60vh] items-center justify-center">
