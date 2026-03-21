@@ -122,7 +122,7 @@ The system comes pre-configured with default accounts via `seed_data`. Test the 
 | Role | Email | Password |
 |---|---|---|
 | **Admin** | `admin@quiz.com` | `admin123` |
-| **Student** | `user@quiz.com` | `User@123` |
+| **Student** | `user@quiz.com` | `User123` |
 
 </div>
 
